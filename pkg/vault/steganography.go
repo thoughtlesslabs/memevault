@@ -2,15 +2,17 @@ package vault
 
 import (
 	"bytes"
+	"embed"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"math/rand"
+	"time"
 
 	"io"
-	"math/rand"
 	"net/http"
 	"os"
-	"time"
 )
 
 // Magic bytes to identify our payload at the end of an image
@@ -98,40 +100,56 @@ func Extract(imagePath string) ([]byte, error) {
 	return payload, nil
 }
 
-// MemeResponse struct for Imgflip API
+// MemeResponse struct for meme-api.com
 type MemeResponse struct {
-	Success bool `json:"success"`
-	Data    struct {
-		Memes []struct {
-			ID   string `json:"id"`
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"memes"`
-	} `json:"data"`
+	PostLink  string   `json:"postLink"`
+	Subreddit string   `json:"subreddit"`
+	Title     string   `json:"title"`
+	URL       string   `json:"url"`
+	NSFW      bool     `json:"nsfw"`
+	Spoiler   bool     `json:"spoiler"`
+	Author    string   `json:"author"`
+	Ups       int      `json:"ups"`
+	Preview   []string `json:"preview"`
 }
 
-// FetchRandomMeme downloads a random meme from imgflip.
+//go:embed memes/*.jpg
+var embeddedMemes embed.FS
+
+// FetchRandomMeme downloads a random meme from meme-api.com, or falls back to embedded memes.
 func FetchRandomMeme() ([]byte, string, error) {
-	resp, err := http.Get("https://api.imgflip.com/get_memes")
+	// Try API first
+	imgData, url, err := fetchFromAPI()
+	if err == nil {
+		return imgData, url, nil
+	}
+
+	// Fallback to embedded
+	fmt.Printf("API failed (%v), using offline fallback...\n", err)
+	return fetchEmbeddedMeme()
+}
+
+func fetchFromAPI() ([]byte, string, error) {
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	resp, err := client.Get("https://meme-api.com/gimme")
 	if err != nil {
 		return nil, "", err
 	}
 	defer resp.Body.Close()
 
-	var memeResp MemeResponse
-	if err := json.NewDecoder(resp.Body).Decode(&memeResp); err != nil {
+	var meme MemeResponse
+	if err := json.NewDecoder(resp.Body).Decode(&meme); err != nil {
 		return nil, "", err
 	}
 
-	if !memeResp.Success || len(memeResp.Data.Memes) == 0 {
-		return nil, "", errors.New("failed to fetch memes from imgflip")
+	if meme.URL == "" {
+		return nil, "", errors.New("failed to fetch meme from api")
 	}
 
-	rand.Seed(time.Now().UnixNano())
-	randomMeme := memeResp.Data.Memes[rand.Intn(len(memeResp.Data.Memes))]
-
 	// Download the image
-	imgResp, err := http.Get(randomMeme.URL)
+	imgResp, err := client.Get(meme.URL)
 	if err != nil {
 		return nil, "", err
 	}
@@ -142,5 +160,26 @@ func FetchRandomMeme() ([]byte, string, error) {
 		return nil, "", err
 	}
 
-	return imgData, randomMeme.URL, nil
+	return imgData, meme.URL, nil
+}
+
+func fetchEmbeddedMeme() ([]byte, string, error) {
+	entries, err := embeddedMemes.ReadDir("memes")
+	if err != nil {
+		return nil, "", err
+	}
+
+	if len(entries) == 0 {
+		return nil, "", errors.New("no embedded memes found")
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	chosen := entries[rand.Intn(len(entries))]
+
+	data, err := embeddedMemes.ReadFile("memes/" + chosen.Name())
+	if err != nil {
+		return nil, "", err
+	}
+
+	return data, "offline-fallback://" + chosen.Name(), nil
 }

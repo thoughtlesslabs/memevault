@@ -73,7 +73,7 @@ var initCmd = &cobra.Command{
 		// If meme requested or default to meme if no generic file
 		finalVaultPath := vaultFile
 
-		if useMeme {
+		if useMeme || sourceImage == "" {
 			// Fetch meme
 			fmt.Println("Fetching a fresh meme from the internet...")
 			imgData, url, err := vault.FetchRandomMeme()
@@ -91,7 +91,7 @@ var initCmd = &cobra.Command{
 				fmt.Printf("Failed to write image: %v\n", err)
 				return
 			}
-		} else if sourceImage != "" {
+		} else {
 			// Copy source image
 			data, err := os.ReadFile(sourceImage)
 			if err != nil {
