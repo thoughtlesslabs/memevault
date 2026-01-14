@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/jdiet/envault/pkg/vault"
 	"github.com/spf13/cobra"
@@ -25,19 +26,38 @@ var initCmd = &cobra.Command{
 			return
 		}
 
-		// 2. Generate Keypair
-		priv, pub, err := vault.GenerateKey()
-		if err != nil {
-			fmt.Printf("Error generating key: %v\n", err)
-			return
-		}
-
+		// 2. Load or Generate Keypair
+		var pub string
 		keyPath := filepath.Join(keyDir, "envault.key")
-		// Don't overwrite existing
+
 		if _, err := os.Stat(keyPath); err == nil {
-			fmt.Printf("Key already exists at %s. backups recommended before re-init.\n", keyPath)
-			// in a real app check force flag
+			fmt.Printf("Key already exists at %s. Using existing key.\n", keyPath)
+			// Load public key from file (stored as comment)
+			content, err := os.ReadFile(keyPath)
+			if err != nil {
+				fmt.Printf("Error reading existing key: %v\n", err)
+				return
+			}
+			// Parse comment for public key
+			lines := strings.Split(string(content), "\n")
+			for _, line := range lines {
+				if strings.HasPrefix(line, "# Public Key: ") {
+					pub = strings.TrimSpace(strings.TrimPrefix(line, "# Public Key: "))
+					break
+				}
+			}
+			if pub == "" {
+				fmt.Println("Could not find public key in existing key file. Please backup and remove it to re-init.")
+				return
+			}
 		} else {
+			priv, newPub, err := vault.GenerateKey()
+			if err != nil {
+				fmt.Printf("Error generating key: %v\n", err)
+				return
+			}
+			pub = newPub
+
 			err = os.WriteFile(keyPath, []byte(priv+"\n# Public Key: "+pub+"\n"), 0600)
 			if err != nil {
 				fmt.Printf("Error checking writing key: %v\n", err)

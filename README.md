@@ -1,0 +1,96 @@
+# Envault 🔒
+
+**Secure, Portable, and Developer-Friendly Secret Management.**
+
+Envault allows you to store your project secrets (API keys, database URLs, etc.) encrypted *inside* your repository, often hidden within an image file (`secrets.jpg`). No more sharing `.env` files over Slack!
+
+## Features
+
+- **Store Secrets in Git**: Encrypted vault committed alongside code.
+- **Steganography**: Hide secrets inside a meme or image (`secrets.jpg`).
+- **Cross-Platform**: Built-in `printenv` polyfill for Windows/Linux consistency.
+- **Multi-User**: Easily `grant` access to teammates.
+- **Key Rotation**: Securely rotate your identity if compromised.
+- **Secret Scanning**: `envault scan` finds missing secrets in your code.
+- **Zero Dependencies**: Single binary (or Node wrapper).
+
+## Installation
+
+### Option A: NPM (Recommended)
+```bash
+npm install -g envault
+```
+
+### Option B: Automatic Script (Bash/Curl)
+**Linux/macOS**:
+```bash
+curl -fsSL https://raw.githubusercontent.com/jdiet/envault/master/install.sh | bash
+```
+
+**Windows (PowerShell)**:
+```powershell
+iwr -useb https://raw.githubusercontent.com/jdiet/envault/master/install.ps1 | iex
+```
+
+### Option C: Build from Source
+```bash
+git clone https://github.com/jdiet/envault.git
+cd envault
+go install
+```
+
+## Quick Start
+
+### 1. Initialize
+Run this in your project root. It generates your "identity" key (if you don't have one) and creates the vault.
+```bash
+envault init --meme
+# Or use your own image: envault init --image ./cool-background.png
+```
+
+### 2. Set Secrets
+```bash
+envault set DB_PASSWORD "s3cr3t_p@ssw0rd"
+envault set API_KEY "12345-abcde"
+```
+
+### 3. Run Your App
+Envault injects the secrets into the environment of the command you run.
+```bash
+# Node.js
+envault run -- node server.js
+
+# Go
+envault run -- go run main.go
+
+# Python
+envault run -- python app.py
+```
+
+## Team Workflow
+
+### Granting Access
+When a new team member joins:
+1. They install Envault and run `envault init`.
+2. They send you their public key (run `envault keys show`).
+3. You authorize them:
+   ```bash
+   envault grant age1...<THEIR_KEY>...
+   ```
+4. Commit the updated `secrets.jpg`.
+
+### Rotating Keys
+If your machine is compromised:
+```bash
+envault keys rotate
+```
+This generates a new keypair, re-encrypts the vault (locking out the old key), and backs up the old key.
+
+## Secret Scanning
+Check if you've used any variables in your code that aren't in the vault:
+```bash
+envault scan
+```
+
+## Security Model
+**Offline Attack Warning**: If an attacker gets a copy of your `secrets.jpg` AND your private key file, they can decrypt that specific version of the file forever. Key rotation only protects future versions and prevents the compromised key from receiving new updates.
