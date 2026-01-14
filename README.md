@@ -74,6 +74,13 @@ memevault run -- go run main.go
 memevault run -- python app.py
 ```
 
+### Advanced Usage
+**Multiple Vaults**: You can specify a different vault file (image) using the `--vault` flag with any command.
+```bash
+memevault get --vault ./production_secrets.jpg
+memevault run --vault ./staging.jpg -- node app.js
+```
+
 ## Team Workflow
 
 ## Managing Access (Multi-User)
