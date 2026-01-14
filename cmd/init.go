@@ -103,7 +103,8 @@ var initCmd = &cobra.Command{
 		}
 
 		// Save secrets
-		if err := saveSecrets(finalVaultPath, initialSecrets, []string{pub}); err != nil {
+		owner := Recipient{Name: "owner", PublicKey: pub}
+		if err := saveSecrets(finalVaultPath, initialSecrets, []Recipient{owner}); err != nil {
 			fmt.Printf("Error creating vault: %v\n", err)
 			return
 		}

@@ -9,11 +9,12 @@ import (
 )
 
 var grantCmd = &cobra.Command{
-	Use:   "grant [PUBLIC_KEY]",
+	Use:   "grant [NAME] [PUBLIC_KEY]",
 	Short: "Grant access to another user (by public key)",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		newRecipient := args[0]
+		name := args[0]
+		key := args[1]
 
 		if keyFile == "" {
 			home, _ := os.UserHomeDir()
@@ -26,14 +27,18 @@ var grantCmd = &cobra.Command{
 			return
 		}
 
-		// Add new recipient to the list (logic handled in saveSecrets now)
-		// We just pass it in. saveSecrets will merge it with existing ones.
-		if err := saveSecrets(vaultFile, secrets, []string{newRecipient}); err != nil {
+		recipients := getRecipients(secrets)
+
+		// TODO: Check if name/key already exists?
+		newRecipient := Recipient{Name: name, PublicKey: key}
+		recipients = append(recipients, newRecipient)
+
+		if err := saveSecrets(vaultFile, secrets, recipients); err != nil {
 			fmt.Printf("Error granting access: %v\n", err)
 			return
 		}
 
-		fmt.Printf("Granted access to %s\n", newRecipient)
+		fmt.Printf("Granted access to %s (%s)\n", name, key)
 	},
 }
 

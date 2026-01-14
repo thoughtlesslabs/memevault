@@ -57,12 +57,12 @@ and revoke the old one, and replaces your local key file (backing up the old one
 
 		// 4. Update Recipients List
 		currentRecipients := getRecipients(secrets)
-		var newRecipients []string
+		var newRecipients []Recipient
 		found := false
 		for _, r := range currentRecipients {
-			if r == oldPubKey {
-				// Replace old with new
-				newRecipients = append(newRecipients, newPub)
+			if r.PublicKey == oldPubKey {
+				// Replace old with new, keep name
+				newRecipients = append(newRecipients, Recipient{Name: r.Name, PublicKey: newPub})
 				found = true
 			} else {
 				// Keep others
@@ -73,7 +73,7 @@ and revoke the old one, and replaces your local key file (backing up the old one
 		// If for some reason we weren't in the list (maybe single user implicit mode?), just add new.
 		if !found {
 			fmt.Println("Warning: Old key was not found in recipients list (maybe it was implicit?). Adding new key anyway.")
-			newRecipients = append(newRecipients, newPub)
+			newRecipients = append(newRecipients, Recipient{Name: "rotated-key", PublicKey: newPub})
 		}
 
 		// 5. Save/Re-encrypt with NEW recipients

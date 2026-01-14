@@ -13,19 +13,38 @@ type SecretsMap map[string]string
 
 const RecipientsKey = "_memevault_recipients"
 
-func getRecipients(secrets SecretsMap) []string {
-	val, ok := secrets[RecipientsKey]
-	if !ok {
-		return []string{}
-	}
-	var recipients []string
-	if err := json.Unmarshal([]byte(val), &recipients); err != nil {
-		return []string{}
-	}
-	return recipients
+type Recipient struct {
+	Name      string `json:"name"`
+	PublicKey string `json:"public_key"`
 }
 
-func setRecipients(secrets SecretsMap, recipients []string) {
+func getRecipients(secrets SecretsMap) []Recipient {
+	val, ok := secrets[RecipientsKey]
+	if !ok {
+		return []Recipient{}
+	}
+
+	// Try parsing as new format
+	var recipients []Recipient
+	if err := json.Unmarshal([]byte(val), &recipients); err == nil {
+		return recipients
+	}
+
+	// Fallback: Try parsing as old format ([]string)
+	var keys []string
+	if err := json.Unmarshal([]byte(val), &keys); err == nil {
+		// Migrate
+		migrated := make([]Recipient, len(keys))
+		for i, k := range keys {
+			migrated[i] = Recipient{Name: fmt.Sprintf("legacy-%s", k[:8]), PublicKey: k}
+		}
+		return migrated
+	}
+
+	return []Recipient{}
+}
+
+func setRecipients(secrets SecretsMap, recipients []Recipient) {
 	data, _ := json.Marshal(recipients)
 	secrets[RecipientsKey] = string(data)
 }
@@ -62,32 +81,22 @@ func loadSecrets(vaultPath string, keyFile string) (SecretsMap, error) {
 	return secrets, nil
 }
 
-func saveSecrets(vaultPath string, secrets SecretsMap, recipients []string) error {
-	// Deduplicate recipients
-	uniqueRecipients := make(map[string]bool)
+func saveSecrets(vaultPath string, secrets SecretsMap, recipients []Recipient) error {
+	// Update internal metadata
+	setRecipients(secrets, recipients)
+
+	// Extract just keys for encryption
+	var keys []string
 	for _, r := range recipients {
-		uniqueRecipients[r] = true
+		keys = append(keys, r.PublicKey)
 	}
-	// Add existing recipients from the secrets map itself
-	for _, r := range getRecipients(secrets) {
-		uniqueRecipients[r] = true
-	}
-
-	// Flatten back to slice
-	var allRecipients []string
-	for r := range uniqueRecipients {
-		allRecipients = append(allRecipients, r)
-	}
-
-	// Store internal list back to map
-	setRecipients(secrets, allRecipients)
 
 	data, err := json.Marshal(secrets)
 	if err != nil {
 		return err
 	}
 
-	encrypted, err := vault.Encrypt(data, allRecipients)
+	encrypted, err := vault.Encrypt(data, keys)
 	if err != nil {
 		return err
 	}
