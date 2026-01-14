@@ -29,7 +29,7 @@ iwr -useb https://github.com/thoughtlesslabs/memevault/releases/latest/download/
 
 ### Option B: Build from Source
 ```bash
-git clone https://github.com/jdiet/memevault.git
+git clone https://github.com/thoughtlesslabs/memevault.git
 cd memevault
 go install
 ```
