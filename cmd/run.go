@@ -18,7 +18,7 @@ var runCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if keyFile == "" {
 			home, _ := os.UserHomeDir()
-			keyFile = filepath.Join(home, ".envault", "keys", "envault.key")
+			keyFile = filepath.Join(home, ".memevault", "keys", "memevault.key")
 		}
 
 		secrets, err := loadSecrets(vaultFile, keyFile)
@@ -56,7 +56,7 @@ var runCmd = &cobra.Command{
 						if len(e) > len(arg)+1 && e[:len(arg)+1] == arg+"=" {
 							fmt.Println(e[len(arg)+1:])
 							found = true
-							break // Match found for this arg (last one wins if duplicates exist, which shouldn't happen with map but os.Environ might have duplicates. We take last one usually or iterate all. Standard printenv prints all if duplicates? envault prioritizes secrets.)
+							break // Match found for this arg (last one wins if duplicates exist, which shouldn't happen with map but os.Environ might have duplicates. We take last one usually or iterate all. Standard printenv prints all if duplicates? memevault prioritizes secrets.)
 							// Actually properly parsing env strings is better.
 						}
 					}

@@ -17,7 +17,7 @@ var grantCmd = &cobra.Command{
 
 		if keyFile == "" {
 			home, _ := os.UserHomeDir()
-			keyFile = filepath.Join(home, ".envault", "keys", "envault.key")
+			keyFile = filepath.Join(home, ".memevault", "keys", "memevault.key")
 		}
 
 		secrets, err := loadSecrets(vaultFile, keyFile)

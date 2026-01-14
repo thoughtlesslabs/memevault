@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jdiet/envault/pkg/vault"
 	"github.com/spf13/cobra"
+	"github.com/thoughtlesslabs/memevault/pkg/vault"
 )
 
 var useMeme bool
@@ -20,7 +20,7 @@ var initCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// 1. Setup Keys Directory
 		home, _ := os.UserHomeDir()
-		keyDir := filepath.Join(home, ".envault", "keys")
+		keyDir := filepath.Join(home, ".memevault", "keys")
 		if err := os.MkdirAll(keyDir, 0700); err != nil {
 			fmt.Printf("Error creating key dir: %v\n", err)
 			return
@@ -28,7 +28,7 @@ var initCmd = &cobra.Command{
 
 		// 2. Load or Generate Keypair
 		var pub string
-		keyPath := filepath.Join(keyDir, "envault.key")
+		keyPath := filepath.Join(keyDir, "memevault.key")
 
 		if _, err := os.Stat(keyPath); err == nil {
 			fmt.Printf("Key already exists at %s. Using existing key.\n", keyPath)

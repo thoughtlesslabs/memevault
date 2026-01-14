@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/jdiet/envault/pkg/vault"
 	"github.com/spf13/cobra"
+	"github.com/thoughtlesslabs/memevault/pkg/vault"
 )
 
 var keysRotateCmd = &cobra.Command{
@@ -18,7 +18,7 @@ and revoke the old one, and replaces your local key file (backing up the old one
 	Run: func(cmd *cobra.Command, args []string) {
 		home, _ := os.UserHomeDir()
 		if keyFile == "" {
-			keyFile = filepath.Join(home, ".envault", "keys", "envault.key")
+			keyFile = filepath.Join(home, ".memevault", "keys", "memevault.key")
 		}
 
 		// 1. Load current secrets with OLD key

@@ -6,12 +6,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/jdiet/envault/pkg/vault"
+	"github.com/thoughtlesslabs/memevault/pkg/vault"
 )
 
 type SecretsMap map[string]string
 
-const RecipientsKey = "_envault_recipients"
+const RecipientsKey = "_memevault_recipients"
 
 func getRecipients(secrets SecretsMap) []string {
 	val, ok := secrets[RecipientsKey]

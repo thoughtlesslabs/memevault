@@ -16,7 +16,7 @@ import (
 )
 
 // Magic bytes to identify our payload at the end of an image
-var MagicBytes = []byte("ENVAULT_MEME")
+var MagicBytes = []byte("MEMEVAULT_MEME")
 
 // Embed appends the encrypted payload to the image at imagePath.
 // Format: [Original Image Bytes] [Payload] [Payload Length (8 bytes)] [Magic Bytes]
@@ -63,7 +63,7 @@ func Extract(imagePath string) ([]byte, error) {
 	fileSize := stat.Size()
 	minSize := int64(len(MagicBytes) + 8)
 	if fileSize < minSize {
-		return nil, errors.New("file too small to contain envault payload")
+		return nil, errors.New("file too small to contain memevault payload")
 	}
 
 	// Read Magic Bytes
@@ -75,7 +75,7 @@ func Extract(imagePath string) ([]byte, error) {
 	if !bytes.Equal(magicBuf, MagicBytes) {
 		// Fallback: maybe it's just a raw encrypted file?
 		// For now, strict steganography check.
-		return nil, errors.New("envault magic bytes not found in image")
+		return nil, errors.New("memevault magic bytes not found in image")
 	}
 
 	// Read Length

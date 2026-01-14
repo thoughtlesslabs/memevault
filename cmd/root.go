@@ -11,10 +11,10 @@ var cfgFile string
 var vaultFile string
 
 var rootCmd = &cobra.Command{
-	Use:   "envault",
-	Short: "A portable, secure environment variable manager",
-	Long: `Envault is a CLI tool to manage environment variables securely using Age encryption.
-It supports sharing secrets via encrypted files and even hiding them inside memes.`,
+	Use:   "memevault",
+	Short: "A portable, secure environment variable manager (with memes)",
+	Long: `Memevault is a CLI tool to manage environment variables securely using Age encryption and steganography.
+It supports sharing secrets via encrypted files hidden inside memes.`,
 }
 
 func Execute() {

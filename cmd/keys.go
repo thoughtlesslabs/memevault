@@ -18,14 +18,14 @@ var keysShowCmd = &cobra.Command{
 	Short: "Show your public key",
 	Run: func(cmd *cobra.Command, args []string) {
 		home, _ := os.UserHomeDir()
-		keyFile := filepath.Join(home, ".envault", "keys", "envault.key")
-		
+		keyFile := filepath.Join(home, ".memevault", "keys", "memevault.key")
+
 		content, err := os.ReadFile(keyFile)
 		if err != nil {
 			fmt.Printf("Error reading key file: %v\n", err)
 			return
 		}
-		
+
 		// Parse comment for public key
 		// In a real app we'd parse the private key object to derive it, but we stored it in comment for convenience
 		fmt.Println(string(content))

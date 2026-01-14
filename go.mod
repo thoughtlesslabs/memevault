@@ -1,4 +1,4 @@
-module github.com/jdiet/envault
+module github.com/thoughtlesslabs/memevault
 
 go 1.21
 

@@ -19,7 +19,7 @@ var setCmd = &cobra.Command{
 
 		if keyFile == "" {
 			home, _ := os.UserHomeDir()
-			keyFile = filepath.Join(home, ".envault", "keys", "envault.key")
+			keyFile = filepath.Join(home, ".memevault", "keys", "memevault.key")
 		}
 
 		secrets, err := loadSecrets(vaultFile, keyFile)
@@ -35,7 +35,7 @@ var setCmd = &cobra.Command{
 		// We'd store the recipient list in cleartext metadata in the vault file or assume config.
 		// For this "Team Handover" demo, we will rely on re-encrypting for ourselves.
 		// TODO: Store recipients in the vault header or dedicated file.
-		
+
 		// Hack for demo: Read public key from keyfile
 		keyContent, _ := os.ReadFile(keyFile)
 		lines := strings.Split(string(keyContent), "\n")

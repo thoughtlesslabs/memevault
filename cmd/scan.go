@@ -91,7 +91,7 @@ indicating environment variable usage (e.g. os.Getenv("VAR"), process.env.VAR).`
 		// Check against vault
 		home, _ := os.UserHomeDir()
 		if keyFile == "" {
-			keyFile = filepath.Join(home, ".envault", "keys", "envault.key")
+			keyFile = filepath.Join(home, ".memevault", "keys", "memevault.key")
 		}
 
 		fmt.Println("\nChecking against vault...")
@@ -116,7 +116,7 @@ indicating environment variable usage (e.g. os.Getenv("VAR"), process.env.VAR).`
 			for _, v := range missing {
 				fmt.Printf("[MISSING] %s\n", v)
 			}
-			fmt.Println("\nRun 'envault set <KEY> <VALUE>' to add them.")
+			fmt.Println("\nRun 'memevault set <KEY> <VALUE>' to add them.")
 		} else {
 			fmt.Println("\nAll variables found in code are present in the vault. Good job!")
 		}

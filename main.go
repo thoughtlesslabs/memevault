@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/jdiet/envault/cmd"
+	"github.com/thoughtlesslabs/memevault/cmd"
 )
 
 func main() {
