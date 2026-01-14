@@ -1,0 +1,21 @@
+# Binaries
+*.exe
+*.dll
+
+# Vaults (don't commit secrets)
+secrets.jpg
+*.key
+
+# Test folders
+tmp_test*
+.envault_test_home/
+.envault/
+TestResults/
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+Desktop.ini
