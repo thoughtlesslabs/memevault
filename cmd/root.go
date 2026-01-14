@@ -10,9 +10,12 @@ import (
 var cfgFile string
 var vaultFile string
 
+const Version = "v1.2.0"
+
 var rootCmd = &cobra.Command{
-	Use:   "memevault",
-	Short: "A portable, secure environment variable manager (with memes)",
+	Use:     "memevault",
+	Version: Version,
+	Short:   "A portable, secure environment variable manager (with memes)",
 	Long: `Memevault is a CLI tool to manage environment variables securely using Age encryption and steganography.
 It supports sharing secrets via encrypted files hidden inside memes.`,
 }

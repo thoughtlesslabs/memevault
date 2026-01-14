@@ -72,44 +72,50 @@ var initCmd = &cobra.Command{
 
 		// If meme requested or default to meme if no generic file
 		finalVaultPath := vaultFile
+		if filepath.Ext(finalVaultPath) == "" {
+			finalVaultPath = "secrets.jpg"
+		}
 
-		if useMeme || sourceImage == "" {
-			// Fetch meme
-			fmt.Println("Fetching a fresh meme from the internet...")
-			imgData, url, err := vault.FetchRandomMeme()
-			if err != nil {
-				fmt.Printf("Failed to fetch meme: %v\n", err)
-				return
-			}
-			fmt.Printf("Got meme: %s\n", url)
-
-			// Save raw image first
-			if filepath.Ext(finalVaultPath) == "" {
-				finalVaultPath = "secrets.jpg"
-			}
-			if err := os.WriteFile(finalVaultPath, imgData, 0644); err != nil {
-				fmt.Printf("Failed to write image: %v\n", err)
-				return
-			}
+		// Check if vault already exists
+		if _, err := os.Stat(finalVaultPath); err == nil {
+			fmt.Printf("Vault file '%s' already exists. Skipping creation to prevent overwrite.\n", finalVaultPath)
+			fmt.Println("To create a new vault, please remove the existing file first.")
 		} else {
-			// Copy source image
-			data, err := os.ReadFile(sourceImage)
-			if err != nil {
-				fmt.Printf("Failed to read source image: %v\n", err)
+			// New Vault Creation Logic
+			if useMeme || sourceImage == "" {
+				// Fetch meme
+				fmt.Println("Fetching a fresh meme from the internet...")
+				imgData, url, err := vault.FetchRandomMeme()
+				if err != nil {
+					fmt.Printf("Failed to fetch meme: %v\n", err)
+					return
+				}
+				fmt.Printf("Got meme: %s\n", url)
+
+				if err := os.WriteFile(finalVaultPath, imgData, 0644); err != nil {
+					fmt.Printf("Failed to write image: %v\n", err)
+					return
+				}
+			} else {
+				// Copy source image
+				data, err := os.ReadFile(sourceImage)
+				if err != nil {
+					fmt.Printf("Failed to read source image: %v\n", err)
+					return
+				}
+				finalVaultPath = filepath.Base(sourceImage) // simplistic
+				os.WriteFile(finalVaultPath, data, 0644)
+			}
+
+			// Save secrets (only for new vault)
+			owner := Recipient{Name: "owner", PublicKey: pub}
+			if err := saveSecrets(finalVaultPath, initialSecrets, []Recipient{owner}); err != nil {
+				fmt.Printf("Error creating vault: %v\n", err)
 				return
 			}
-			finalVaultPath = filepath.Base(sourceImage) // simplistic
-			os.WriteFile(finalVaultPath, data, 0644)
-		}
 
-		// Save secrets
-		owner := Recipient{Name: "owner", PublicKey: pub}
-		if err := saveSecrets(finalVaultPath, initialSecrets, []Recipient{owner}); err != nil {
-			fmt.Printf("Error creating vault: %v\n", err)
-			return
+			fmt.Printf("Initialized vault at %s\n", finalVaultPath)
 		}
-
-		fmt.Printf("Initialized vault at %s\n", finalVaultPath)
 	},
 }
 
