@@ -50,7 +50,18 @@ memevault set DB_PASSWORD "s3cr3t_p@ssw0rd"
 memevault set API_KEY "12345-abcde"
 ```
 
-### 3. Run Your App
+### 3. View Secrets
+You can inspect what's inside the vault:
+```bash
+# List all secrets
+memevault get
+
+# Get a specific secret
+memevault get API_KEY
+```
+*Note: This respects access control. You must be an authorized user to decrypt and view secrets.*
+
+### 4. Run Your App
 Memevault injects the secrets into the environment of the command you run.
 ```bash
 # Node.js
@@ -65,15 +76,30 @@ memevault run -- python app.py
 
 ## Team Workflow
 
-### Granting Access
-When a new team member joins:
-1. They install Memevault and run `memevault init`.
-2. They send you their public key (run `memevault keys show`).
-3. You authorize them:
-   ```bash
-   memevault grant age1...<THEIR_KEY>...
-   ```
-4. Commit the updated `secrets.jpg`.
+## Managing Access (Multi-User)
+
+Memevault allows you to share secrets with your team securely using **Named Access Keys**.
+
+### 1. View Access List
+To see who has access to the vault:
+```bash
+memevault access list
+```
+
+### 2. Grant Access
+To add a team member, ask for their public key (`memevault keys show`) and add them:
+```bash
+# Usage: memevault grant [NAME] [PUBLIC_KEY]
+memevault grant bob age1...
+```
+This will re-encrypt the vault so that both you and Bob can access it.
+
+### 3. Revoke Access
+To remove a team member:
+```bash
+memevault access remove bob
+```
+This immediately re-encrypts the vault with the remaining keys, locking Bob out.
 
 ### Rotating Keys
 If your machine is compromised:
