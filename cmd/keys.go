@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -27,8 +28,14 @@ var keysShowCmd = &cobra.Command{
 		}
 
 		// Parse comment for public key
-		// In a real app we'd parse the private key object to derive it, but we stored it in comment for convenience
-		fmt.Println(string(content))
+		lines := strings.Split(string(content), "\n")
+		for _, line := range lines {
+			if strings.HasPrefix(line, "# Public Key: ") {
+				fmt.Println(strings.TrimPrefix(line, "# Public Key: "))
+				return
+			}
+		}
+		fmt.Println("Error: Public key not found in key file")
 	},
 }
 

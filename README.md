@@ -2,7 +2,7 @@
 
 **Secure, Portable, and Developer-Friendly Secret Management (with Memes).**
 
-Memevault allows you to store your project secrets (API keys, database URLs, etc.) encrypted *inside* your repository, often hidden within an image file (`secrets.jpg`). No more sharing `.env` files over Slack!
+Memevault allows you to store your project secrets (API keys, database URLs, etc.) encrypted *inside* your repository, always hidden within a meme image (`secrets.jpg`). No more sharing `.env` files over Slack!
 
 ## Features
 

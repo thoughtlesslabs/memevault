@@ -8,8 +8,8 @@ secrets.jpg
 
 # Test folders
 tmp_test*
-.envault_test_home/
-.envault/
+.memevault_test_home/
+.memevault/
 TestResults/
 
 # Editor/IDE
