@@ -16,7 +16,18 @@ Memevault allows you to store your project secrets (API keys, database URLs, etc
 
 ## Installation
 
-### Option A: Build from Source
+### Option A: Automatic Script (Recommended)
+**Linux/macOS**:
+```bash
+curl -fsSL https://github.com/thoughtlesslabs/memevault/releases/latest/download/install.sh | bash
+```
+
+**Windows (PowerShell)**:
+```powershell
+iwr -useb https://github.com/thoughtlesslabs/memevault/releases/latest/download/install.ps1 | iex
+```
+
+### Option B: Build from Source
 ```bash
 git clone https://github.com/jdiet/memevault.git
 cd memevault
