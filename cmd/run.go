@@ -42,6 +42,10 @@ var runCmd = &cobra.Command{
 			if k == RecipientsKey {
 				continue
 			}
+			if !isValidKey(k) {
+				fmt.Fprintf(os.Stderr, "Warning: Skipping invalid key '%s' found in vault.\n", k)
+				continue
+			}
 			env = append(env, fmt.Sprintf("%s=%s", k, v))
 		}
 

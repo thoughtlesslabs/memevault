@@ -5,6 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"regexp"
+	"strings"
+
 	"github.com/spf13/cobra"
 )
 
@@ -17,6 +20,16 @@ var setCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		key := args[0]
 		val := args[1]
+
+		if !isValidKey(key) {
+			fmt.Printf("Error: Key '%s' contains invalid characters. Keys must match [a-zA-Z_][a-zA-Z0-9_]*\n", key)
+			os.Exit(1)
+		}
+
+		if strings.ContainsAny(val, "\n\r") {
+			fmt.Println("Error: Value contains newlines or control characters, which can cause injection issues.")
+			os.Exit(1)
+		}
 
 		if keyFile == "" {
 			home, _ := os.UserHomeDir()
@@ -56,4 +69,9 @@ var setCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(setCmd)
 	setCmd.Flags().BoolVarP(&forceSet, "force", "f", false, "Skip confirmation prompt")
+}
+
+func isValidKey(key string) bool {
+	matched, _ := regexp.MatchString(`^[a-zA-Z_][a-zA-Z0-9_]*$`, key)
+	return matched
 }

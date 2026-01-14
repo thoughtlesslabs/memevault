@@ -50,7 +50,7 @@ var getCmd = &cobra.Command{
 			sort.Strings(keys)
 
 			for _, k := range keys {
-				fmt.Printf("%s=%s\n", k, secrets[k])
+				fmt.Printf("%s=%q\n", k, secrets[k])
 			}
 		}
 	},
